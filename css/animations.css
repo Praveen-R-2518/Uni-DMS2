@@ -55,6 +55,28 @@
     }
 }
 
+@keyframes aboutSoftLift {
+    from {
+        opacity: 0;
+        transform: translateY(14px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+@keyframes aboutImageIn {
+    from {
+        opacity: 0;
+        transform: translate(-50%, 52%) scale(0.985);
+    }
+    to {
+        opacity: 1;
+        transform: translate(-50%, 50%) scale(1);
+    }
+}
+
 .reveal-on-scroll {
     opacity: 0;
     transform: translateY(24px);
@@ -64,6 +86,113 @@
 .reveal-visible {
     opacity: 1;
     transform: translateY(0);
+}
+
+.about-hero .hero-content > * {
+    opacity: 0;
+    animation: aboutSoftLift 620ms var(--ease-default) forwards;
+}
+
+.about-hero .hero-content > .eyebrow {
+    animation-delay: 120ms;
+}
+
+.about-hero .hero-content > h1 {
+    animation-delay: 220ms;
+}
+
+.about-hero .hero-content > .page-hero-meta {
+    animation-delay: 320ms;
+}
+
+.about-hero .about-hero-image-wrap {
+    opacity: 0;
+    animation: aboutImageIn 840ms var(--ease-default) 240ms forwards;
+}
+
+.glass-story-card,
+.offer-card {
+    transition: transform 240ms var(--ease-default), box-shadow 240ms var(--ease-default);
+}
+
+.glass-story-card .story-copy > * {
+    opacity: 0;
+    transform: translateX(18px);
+    transition: opacity 420ms var(--ease-default), transform 420ms var(--ease-default);
+}
+
+.mission-card .story-copy > * {
+    transform: translateX(-18px);
+}
+
+.glass-story-card.reveal-visible .story-copy > * {
+    opacity: 1;
+    transform: translateX(0);
+}
+
+.glass-story-card.reveal-visible .story-copy > *:nth-child(1) {
+    transition-delay: 120ms;
+}
+
+.glass-story-card.reveal-visible .story-copy > *:nth-child(2) {
+    transition-delay: 190ms;
+}
+
+.glass-story-card.reveal-visible .story-copy > *:nth-child(3) {
+    transition-delay: 260ms;
+}
+
+.glass-story-card.reveal-visible .story-copy > *:nth-child(4) {
+    transition-delay: 330ms;
+}
+
+.cta-energy-content {
+    opacity: 0;
+    animation: ctaFadeInUp 680ms var(--ease-default) forwards;
+}
+
+.cta-energy-heading {
+    opacity: 0;
+    animation: ctaHeadingPulse 720ms var(--ease-default) 180ms forwards;
+}
+
+.cta-energy-subheading {
+    opacity: 0;
+    animation: ctaFadeInUp 580ms var(--ease-default) 380ms forwards;
+}
+
+.cta-energy-buttons {
+    opacity: 0;
+    animation: ctaFadeInUp 620ms var(--ease-default) 560ms forwards;
+}
+
+@keyframes ctaFadeInUp {
+    from {
+        opacity: 0;
+        transform: translateY(20px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+@keyframes ctaHeadingPulse {
+    0% {
+        opacity: 0;
+        transform: scale(0.92) translateY(18px);
+    }
+    100% {
+        opacity: 1;
+        transform: scale(1) translateY(0);
+    }
+}
+
+.glass-story-card:hover,
+.glass-story-card:focus-within,
+.offer-card:hover,
+.offer-card:focus-within {
+    transform: translateY(-4px);
 }
 
 @media (prefers-reduced-motion: reduce) {
