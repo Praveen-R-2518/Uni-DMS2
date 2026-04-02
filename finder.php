@@ -11,12 +11,19 @@ $searchMode = ""; // "zscore" or "name"
 $subjects = ["Combined Mathematics", "Physics", "Chemistry", "ICT", "Biology", "Accounting", "Business Statistics", "Economics", "Any"];
 $districts = ["COLOMBO", "GAMPAHA", "KALUTARA", "MATALE", "KANDY", "NUWARA ELIYA", "GALLE", "MATARA", "HAMBANTOTA", "JAFFNA", "KILINOCHCHI", "MANNAR", "MULLAITIVU", "VAVUNIYA", "TRINCOMALEE", "BATTICALOA", "AMPARA", "PUTTALAM", "KURUNEGALA", "ANURADHAPURA", "POLONNARUWA", "BADULLA", "MONARAGALA", "All Island Ranges"];
 
-// Fetch distinct universities from flat_zscores
+// Fetch distinct universities and degree names from flat_zscores
 $uniList = [];
+$degreeNamesList = [];
 $res = $conn->query("SELECT DISTINCT university_name FROM flat_zscores ORDER BY university_name ASC");
 if ($res) {
     while ($row = $res->fetch_assoc()) {
         $uniList[] = $row['university_name'];
+    }
+}
+$resDeg = $conn->query("SELECT DISTINCT degree_name FROM flat_zscores ORDER BY degree_name ASC");
+if ($resDeg) {
+    while ($row = $resDeg->fetch_assoc()) {
+        $degreeNamesList[] = $row['degree_name'];
     }
 }
 
@@ -70,16 +77,25 @@ if ($_SERVER["REQUEST_METHOD"] === "POST") {
         // To use dropdowns for both degree name and university, we check if they are provided
         if (!empty(trim($degreeSearchName))) {
             $likeDegree = "%" . $degreeSearchName . "%";
-            $query = "SELECT * FROM flat_zscores WHERE degree_name LIKE ?";
+            $query = "
+                SELECT f.*, 
+                       MAX(d.duration) as duration, 
+                       MAX(d.medium) as medium, 
+                       MAX(d.description) as description,
+                       MAX(d.department_id) as dept_id
+                FROM flat_zscores f 
+                LEFT JOIN degrees d ON f.degree_name = d.name
+                WHERE f.degree_name LIKE ?";
+            
             $types = "s";
             $params = [$likeDegree];
             
             if (!empty($searchUniversity)) {
-                $query .= " AND university_name = ?";
+                $query .= " AND f.university_name = ?";
                 $types .= "s";
                 $params[] = $searchUniversity;
             }
-            $query .= " ORDER BY degree_name ASC";
+            $query .= " GROUP BY f.id ORDER BY f.degree_name ASC";
             
             $stmt = $conn->prepare($query);
             $stmt->bind_param($types, ...$params);
@@ -193,7 +209,12 @@ include "includes/header.php";
                 
                 <div class="form-field" style="margin-bottom: 16px;">
                     <label>Degree Name</label>
-                    <input type="text" id="searchInput" name="search_degree_name" placeholder="e.g. Artificial Intelligence" value="<?php echo htmlspecialchars($degreeSearchName); ?>" required style="width:100%; padding: 8px; border-radius: 4px; border: 1px solid #ccc;">
+                    <input type="text" id="searchInput" name="search_degree_name" list="degreeNameOptions" placeholder="e.g. Artificial Intelligence" value="<?php echo htmlspecialchars($degreeSearchName); ?>" required style="width:100%; padding: 8px; border-radius: 4px; border: 1px solid #ccc;">
+                    <datalist id="degreeNameOptions">
+                        <?php foreach($degreeNamesList as $dn): ?>
+                            <option value="<?php echo htmlspecialchars($dn); ?>"></option>
+                        <?php endforeach; ?>
+                    </datalist>
                 </div>
                 
                 <div class="form-field" style="margin-bottom: 16px;">
@@ -223,40 +244,63 @@ include "includes/header.php";
                 <?php if ($degrees): ?>
                     <div style="overflow-x:auto;">
                         <?php if ($searchMode === 'name'): ?>
-                            <table style="width:100%; border-collapse: collapse; margin-bottom: 32px; text-align: left; background: #fff; box-shadow: 0 4px 6px rgba(0,0,0,0.05); border-radius: 8px; overflow: hidden; white-space: nowrap;">
-                                <thead style="background: #f8f9fa;">
-                                    <tr style="border-bottom: 2px solid #eaeaea;">
-                                        <th style="padding: 16px;">Degree</th>
-                                        <th style="padding: 16px;">University</th>
-                                        <?php 
-                                        $districtCols = [
-                                            'colombo','gampaha','kalutara','matale','kandy','nuwara_eliya','galle','matara','hambantota','jaffna','kilinochchi','mannar','mullaitivu','vavuniya','trincomalee','batticaloa','ampara','puttalam','kurunegala','anuradhapura','polonnaruwa','badulla','monaragala','ratnapura','kegalle'
-                                        ];
-                                        foreach($districtCols as $dc): 
-                                            $dName = ucwords(str_replace('_', ' ', $dc));
-                                        ?>
-                                            <th style="padding: 16px;"><?php echo htmlspecialchars($dName); ?></th>
-                                        <?php endforeach; ?>
-                                    </tr>
-                                </thead>
-                                <tbody>
-                                    <?php foreach ($degrees as $index => $deg): ?>
-                                        <tr style="border-bottom: 1px solid #f1f1f1; transition: background 0.2s;">
-                                            <td style="padding: 16px; color: #333; font-weight: 500; position: sticky; left: 0; background: #fff; border-right: 1px solid #eee; z-index: 1;"><?php echo htmlspecialchars($deg["degree_name"]); ?></td>
-                                            <td style="padding: 16px; color: #555; position: sticky; left: 200px; background: #fff; border-right: 1px solid #eee; z-index: 1;"><?php echo htmlspecialchars($deg["university_name"]); ?></td>
-                                            <?php foreach($districtCols as $dc): ?>
-                                                <td style="padding: 16px; color: #555; text-align: center;">
-                                                    <?php if(isset($deg[$dc]) && $deg[$dc] !== null): ?>
-                                                        <span style="background: #e9ecef; padding: 4px 8px; border-radius: 4px; font-weight: bold;"><?php echo htmlspecialchars($deg[$dc]); ?></span>
-                                                    <?php else: ?>
-                                                        <span style="color: #aaa;">-</span>
-                                                    <?php endif; ?>
-                                                </td>
-                                            <?php endforeach; ?>
-                                        </tr>
-                                    <?php endforeach; ?>
-                                </tbody>
-                            </table>
+                            <?php foreach ($degrees as $index => $deg): ?>
+                                <div style="margin-bottom: 48px; background: #fff; border-radius: 8px; box-shadow: 0 4px 6px rgba(0,0,0,0.05); overflow: hidden; display: flex; flex-wrap: wrap;">
+                                    
+                                    <!-- Degree Details (Left side) -->
+                                    <div style="flex: 1; padding: 24px; min-width: 300px; border-right: 1px solid #eaeaea;">
+                                        <h3 style="margin-bottom: 16px; font-size: 1.5rem; color: #0056b3;"><?php echo htmlspecialchars($deg["degree_name"]); ?></h3>
+                                        <p style="font-size: 1.1rem; color: #555; margin-bottom: 24px;"><strong>University:</strong> <?php echo htmlspecialchars($deg["university_name"]); ?></p>
+                                        
+                                        <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 16px; margin-bottom: 24px;">
+                                            <div><strong style="color: #666;">Duration:</strong> <br><?php echo !empty($deg["duration"]) ? htmlspecialchars($deg["duration"]) : "Not Specified"; ?></div>
+                                            <div><strong style="color: #666;">Medium:</strong> <br><?php echo !empty($deg["medium"]) ? htmlspecialchars($deg["medium"]) : "Not Specified"; ?></div>
+                                            <div><strong style="color: #666;">Subject Req 1:</strong> <br><?php echo !empty($deg["subject1"]) ? htmlspecialchars($deg["subject1"]) : "-"; ?></div>
+                                            <div><strong style="color: #666;">Subject Req 2/3:</strong> <br><?php echo (!empty($deg["subject2"]) ? htmlspecialchars($deg["subject2"]) : "-") . " / " . (!empty($deg["subject3"]) ? htmlspecialchars($deg["subject3"]) : "-"); ?></div>
+                                        </div>
+                                        
+                                        <?php if(!empty($deg["description"])): ?>
+                                            <div style="background: #f8f9fa; padding: 16px; border-radius: 6px;">
+                                                <strong style="color: #666;">Description:</strong>
+                                                <p style="margin-top: 8px; color: #444; font-size: 0.95rem; line-height: 1.5;"><?php echo htmlspecialchars($deg["description"]); ?></p>
+                                            </div>
+                                        <?php endif; ?>
+                                    </div>
+
+                                    <!-- Cutoffs Table (Right side vertical) -->
+                                    <div style="flex: 1; min-width: 300px; max-height: 480px; overflow-y: auto;">
+                                        <table style="width:100%; border-collapse: collapse; text-align: left;">
+                                            <thead style="background: #f8f9fa; position: sticky; top: 0; z-index: 10;">
+                                                <tr style="border-bottom: 2px solid #eaeaea;">
+                                                    <th style="padding: 16px;">District</th>
+                                                    <th style="padding: 16px;">Z-Score Cutoff</th>
+                                                </tr>
+                                            </thead>
+                                            <tbody>
+                                                <?php 
+                                                $districtCols = [
+                                                    'colombo','gampaha','kalutara','matale','kandy','nuwara_eliya','galle','matara','hambantota','jaffna','kilinochchi','mannar','mullaitivu','vavuniya','trincomalee','batticaloa','ampara','puttalam','kurunegala','anuradhapura','polonnaruwa','badulla','monaragala','ratnapura','kegalle'
+                                                ];
+                                                foreach($districtCols as $dc): 
+                                                    $dName = ucwords(str_replace('_', ' ', $dc));
+                                                    $val = $deg[$dc] ?? null;
+                                                ?>
+                                                    <tr style="border-bottom: 1px solid #f1f1f1;">
+                                                        <td style="padding: 12px 16px; color: #333; font-weight: 500;"><?php echo htmlspecialchars($dName); ?></td>
+                                                        <td style="padding: 12px 16px;">
+                                                            <?php if($val !== null): ?>
+                                                                <span style="background: #e9ecef; padding: 4px 8px; border-radius: 4px; font-weight: bold; color: #0056b3;"><?php echo htmlspecialchars($val); ?></span>
+                                                            <?php else: ?>
+                                                                <span style="color: #aaa;">-</span>
+                                                            <?php endif; ?>
+                                                        </td>
+                                                    </tr>
+                                                <?php endforeach; ?>
+                                            </tbody>
+                                        </table>
+                                    </div>
+                                </div>
+                            <?php endforeach; ?>
                         <?php else: ?>
                             <table style="width:100%; border-collapse: collapse; margin-bottom: 32px; text-align: left; background: #fff; box-shadow: 0 4px 6px rgba(0,0,0,0.05); border-radius: 8px; overflow: hidden;">
                                 <thead style="background: #f8f9fa;">
