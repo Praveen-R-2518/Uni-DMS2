@@ -209,7 +209,7 @@ include "includes/header.php";
                 
                 <div class="form-field" style="margin-bottom: 16px;">
                     <label>Degree Name</label>
-                    <input type="text" id="searchInput" name="search_degree_name" list="degreeNameOptions" placeholder="e.g. Artificial Intelligence" value="<?php echo htmlspecialchars($degreeSearchName); ?>" required style="width:100%; padding: 8px; border-radius: 4px; border: 1px solid #ccc;">
+                    <input type="text" id="searchInput" name="search_degree_name" list="degreeNameOptions" placeholder="" value="<?php echo htmlspecialchars($degreeSearchName); ?>" required style="width:100%; padding: 8px; border-radius: 4px; border: 1px solid #ccc;">
                     <datalist id="degreeNameOptions">
                         <?php foreach($degreeNamesList as $dn): ?>
                             <option value="<?php echo htmlspecialchars($dn); ?>"></option>
