@@ -2,6 +2,8 @@
 require_once 'includes/db.php';
 require_once 'includes/ui-helpers.php';
 
+$pageStyles = ['css/pages/universities.css'];
+
 $id = filter_input(INPUT_GET, 'id', FILTER_VALIDATE_INT);
 $university = null;
 $degrees = [];
@@ -33,7 +35,7 @@ include 'includes/header.php';
 ?>
 <?php if ($university): ?>
     <section class="page-hero reveal-on-scroll detail-hero">
-        <div class="container hero-detail">
+        <div class="container">
             <div class="hero-text">
                 <p class="eyebrow">University story</p>
                 <h1><?php echo htmlspecialchars($university['name']); ?></h1>
@@ -49,14 +51,6 @@ include 'includes/header.php';
                     <span class="pill"><?php echo htmlspecialchars(getUniversityType($university)); ?></span>
                     <span class="pill"><?php echo htmlspecialchars(getUniversityLocation($university)); ?></span>
                 </div>
-            </div>
-            <div class="hero-media">
-                <?php $heroImage = getUniversityImagePath($university); ?>
-                <?php if ($heroImage): ?>
-                    <img src="<?php echo htmlspecialchars($heroImage, ENT_QUOTES, 'UTF-8'); ?>" alt="<?php echo htmlspecialchars($university['name']); ?>" loading="lazy">
-                <?php else: ?>
-                    <div class="hero-media-placeholder"></div>
-                <?php endif; ?>
             </div>
         </div>
     </section>
