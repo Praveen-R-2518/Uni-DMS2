@@ -153,6 +153,153 @@
     margin-bottom: var(--space-12);
 }
 
+.hero-flow-slider {
+    position: relative;
+    min-height: 320px;
+    max-width: 540px;
+    margin: 0 auto;
+    isolation: isolate;
+}
+
+.flow-card {
+    position: absolute;
+    inset: 0;
+    border-radius: 20px;
+    padding: clamp(20px, 3vw, 34px);
+    border: 1px solid rgba(255, 255, 255, 0.42);
+    background:
+        linear-gradient(140deg, rgba(99, 102, 241, 0.16) 0%, rgba(15, 23, 42, 0.35) 38%, rgba(8, 12, 20, 0.5) 100%),
+        rgba(10, 14, 26, 0.5);
+    backdrop-filter: blur(22px) saturate(165%);
+    -webkit-backdrop-filter: blur(22px) saturate(165%);
+    box-shadow: 0 22px 46px rgba(5, 8, 18, 0.42), inset 0 1px 0 rgba(255, 255, 255, 0.48);
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-4);
+    justify-content: center;
+    align-items: center;
+    text-align: center;
+    opacity: 0;
+    transform: translateX(8%);
+    animation: flowCardCycle 12s ease-in-out infinite;
+    overflow: hidden;
+    isolation: isolate;
+    z-index: 1;
+    visibility: hidden;
+    pointer-events: none;
+}
+
+.flow-card::before {
+    content: '';
+    position: absolute;
+    inset: 0;
+    background-image: url('../../images/Pattern.jpg');
+    background-size: cover;
+    background-position: center;
+    background-repeat: no-repeat;
+    opacity: 0.02;
+    mix-blend-mode: soft-light;
+    z-index: 0;
+    pointer-events: none;
+}
+
+.flow-card::after {
+    content: '';
+    position: absolute;
+    inset: 0;
+    border-radius: inherit;
+    border: 1px solid rgba(255, 255, 255, 0.18);
+    background: linear-gradient(180deg, rgba(255, 255, 255, 0.24) 0%, rgba(255, 255, 255, 0.03) 35%, rgba(255, 255, 255, 0) 100%);
+    pointer-events: none;
+    z-index: 0;
+}
+
+.flow-card > * {
+    position: relative;
+    z-index: 1;
+}
+
+.flow-card h3 {
+    margin: 0;
+}
+
+.flow-card p {
+    max-width: 62ch;
+    color: var(--text-on-dark-secondary);
+}
+
+.flow-card h3 {
+    color: var(--text-on-dark-primary);
+}
+
+.flow-card .btn {
+    width: fit-content;
+    margin: 0 auto;
+}
+
+.flow-card .btn-secondary {
+    border-color: rgba(255, 255, 255, 0.35);
+    color: var(--text-on-dark-primary);
+    background: rgba(255, 255, 255, 0.05);
+}
+
+.flow-card .btn-secondary:hover,
+.flow-card .btn-secondary:focus-visible {
+    background: rgba(255, 255, 255, 0.18);
+    color: #ffffff;
+}
+
+.flow-card.is-browse {
+    animation-delay: 0s;
+}
+
+.flow-card.is-gallery {
+    animation-delay: 4s;
+}
+
+.flow-card.is-finder {
+    animation-delay: 8s;
+}
+
+@keyframes flowCardCycle {
+    0% {
+        opacity: 0;
+        transform: translateX(8%);
+        visibility: hidden;
+        pointer-events: none;
+    }
+    8% {
+        opacity: 1;
+        transform: translateX(0);
+        visibility: visible;
+        pointer-events: auto;
+    }
+    28% {
+        opacity: 1;
+        transform: translateX(0);
+        visibility: visible;
+        pointer-events: auto;
+    }
+    36% {
+        opacity: 0;
+        transform: translateX(-8%);
+        visibility: hidden;
+        pointer-events: none;
+    }
+    100% {
+        opacity: 0;
+        transform: translateX(-8%);
+        visibility: hidden;
+        pointer-events: none;
+    }
+}
+
+@media (max-width: var(--bp-sm)) {
+    .hero-flow-slider {
+        min-height: 360px;
+    }
+}
+
 .bento-grid {
     display: grid;
     grid-template-columns: repeat(12, 1fr);
