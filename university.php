@@ -126,13 +126,13 @@ include 'includes/header.php';
         <?php if (!empty($groupedDegrees)): ?>
             <?php foreach ($groupedDegrees as $streamName => $streamDegrees): ?>
                 <div class="stream-group">
-                    <h3 class="stream-title" style="margin-top: 2rem; border-bottom: 2px solid var(--primary-color); padding-bottom: 0.5rem; display: inline-block;">
+                    <h3 class="stream-title" style="margin-top: 2rem; border-bottom: 2px solid var(--primary-color); padding-bottom: 0.5rem; display: inline-block; font-weight: bold;">
                         <?php echo htmlspecialchars($streamName); ?>
                     </h3>
                     <div class="finder-results" style="margin-top: 1rem;">
                         <?php foreach ($streamDegrees as $degree): ?>
                             <article class="finder-card reveal-on-scroll">
-                                <h3><?php echo htmlspecialchars($degree['degree_name']); ?></h3>
+                                <h3 style="font-weight: normal;"><?php echo htmlspecialchars($degree['degree_name']); ?></h3>
                                 <?php if (!empty($degree['faculty_name'])): ?>
                                     <p><strong>Faculty:</strong> <?php echo htmlspecialchars($degree['faculty_name']); ?></p>
                                 <?php endif; ?>
