@@ -222,16 +222,52 @@ include "includes/header.php";
             <div class="finder-results">
                 <?php if ($degrees): ?>
                     <div style="overflow-x:auto;">
-                        <table style="width:100%; border-collapse: collapse; margin-bottom: 32px; text-align: left; background: #fff; box-shadow: 0 4px 6px rgba(0,0,0,0.05); border-radius: 8px; overflow: hidden;">
-                            <thead style="background: #f8f9fa;">
-                                <tr style="border-bottom: 2px solid #eaeaea;">
-                                    <th style="padding: 16px;">Degree</th>
-                                    <th style="padding: 16px;">University</th>
-                                    <th style="padding: 16px;">Z-Score Cutoff</th>
-                                    <th style="padding: 16px;">Actions</th>
-                                </tr>
-                            </thead>
-                            <tbody>
+                        <?php if ($searchMode === 'name'): ?>
+                            <table style="width:100%; border-collapse: collapse; margin-bottom: 32px; text-align: left; background: #fff; box-shadow: 0 4px 6px rgba(0,0,0,0.05); border-radius: 8px; overflow: hidden; white-space: nowrap;">
+                                <thead style="background: #f8f9fa;">
+                                    <tr style="border-bottom: 2px solid #eaeaea;">
+                                        <th style="padding: 16px;">Degree</th>
+                                        <th style="padding: 16px;">University</th>
+                                        <?php 
+                                        $districtCols = [
+                                            'colombo','gampaha','kalutara','matale','kandy','nuwara_eliya','galle','matara','hambantota','jaffna','kilinochchi','mannar','mullaitivu','vavuniya','trincomalee','batticaloa','ampara','puttalam','kurunegala','anuradhapura','polonnaruwa','badulla','monaragala','ratnapura','kegalle'
+                                        ];
+                                        foreach($districtCols as $dc): 
+                                            $dName = ucwords(str_replace('_', ' ', $dc));
+                                        ?>
+                                            <th style="padding: 16px;"><?php echo htmlspecialchars($dName); ?></th>
+                                        <?php endforeach; ?>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    <?php foreach ($degrees as $index => $deg): ?>
+                                        <tr style="border-bottom: 1px solid #f1f1f1; transition: background 0.2s;">
+                                            <td style="padding: 16px; color: #333; font-weight: 500; position: sticky; left: 0; background: #fff; border-right: 1px solid #eee; z-index: 1;"><?php echo htmlspecialchars($deg["degree_name"]); ?></td>
+                                            <td style="padding: 16px; color: #555; position: sticky; left: 200px; background: #fff; border-right: 1px solid #eee; z-index: 1;"><?php echo htmlspecialchars($deg["university_name"]); ?></td>
+                                            <?php foreach($districtCols as $dc): ?>
+                                                <td style="padding: 16px; color: #555; text-align: center;">
+                                                    <?php if(isset($deg[$dc]) && $deg[$dc] !== null): ?>
+                                                        <span style="background: #e9ecef; padding: 4px 8px; border-radius: 4px; font-weight: bold;"><?php echo htmlspecialchars($deg[$dc]); ?></span>
+                                                    <?php else: ?>
+                                                        <span style="color: #aaa;">-</span>
+                                                    <?php endif; ?>
+                                                </td>
+                                            <?php endforeach; ?>
+                                        </tr>
+                                    <?php endforeach; ?>
+                                </tbody>
+                            </table>
+                        <?php else: ?>
+                            <table style="width:100%; border-collapse: collapse; margin-bottom: 32px; text-align: left; background: #fff; box-shadow: 0 4px 6px rgba(0,0,0,0.05); border-radius: 8px; overflow: hidden;">
+                                <thead style="background: #f8f9fa;">
+                                    <tr style="border-bottom: 2px solid #eaeaea;">
+                                        <th style="padding: 16px;">Degree</th>
+                                        <th style="padding: 16px;">University</th>
+                                        <th style="padding: 16px;">Z-Score Cutoff</th>
+                                        <th style="padding: 16px;">Actions</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
                                 <?php foreach ($degrees as $index => $deg): ?>
                                     <tr id="row-<?php echo $index; ?>" style="border-bottom: 1px solid #f1f1f1; transition: background 0.2s;">
                                         <td style="padding: 16px; color: #333; font-weight: 500;"><?php echo htmlspecialchars($deg["degree_name"]); ?></td>
@@ -280,6 +316,7 @@ include "includes/header.php";
                                 <?php endforeach; ?>
                             </tbody>
                         </table>
+                        <?php endif; ?>
                     </div>
                 <?php else: ?>
                     <p class="section-subtitle">
