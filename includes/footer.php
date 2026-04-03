@@ -1,7 +1,7 @@
 <?php
 $footerNav = [
     'Navigate' => ['Home' => 'index.php', 'Universities' => 'universities.php', 'Z-Score Finder' => 'finder.php'],
-    'Resources' => ['Gallery' => 'gallery.php', 'About' => 'about.php', 'Sign In' => 'login.php']
+    'Resources' => ['Gallery' => 'gallery.php', 'About' => 'about.php']
 ];
 ?>
     </main>

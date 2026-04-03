@@ -10,7 +10,7 @@
     -webkit-backdrop-filter: blur(12px);
     border-bottom: 1px solid rgba(255, 255, 255, 0.12);
     border-radius: 0;
-    padding: 12px clamp(14px, 3vw, 36px);
+    padding: 20px clamp(14px, 3vw, 36px);
     display: flex;
     justify-content: space-between;
     align-items: center;
@@ -43,7 +43,9 @@
 }
 
 nav {
-    justify-self: center;
+    flex: 1;
+    display: flex;
+    justify-content: center;
 }
 
 .nav-links {
@@ -51,11 +53,14 @@ nav {
     gap: var(--space-4);
     align-items: center;
     justify-content: center;
+    list-style: none;
+    margin: 0;
+    padding: 0;
 }
 
 .nav-link {
     font-weight: 500;
-    font-size: var(--text-sm);
+    font-size: var(--text-base);
     color: var(--text-on-dark-secondary);
     padding: 6px 12px;
     border-radius: var(--radius-full);

@@ -49,8 +49,6 @@ $currentScript = basename($_SERVER['PHP_SELF']);
             </div>
         </nav>
         <div class="nav-actions">
-            <a class="btn btn-secondary" href="login.php">Sign In</a>
-            <a class="btn btn-primary" href="finder.php">Find My Degree</a>
             <button class="nav-toggle" type="button" aria-controls="navDrawer" aria-expanded="false" aria-label="Open navigation menu">
                 <span></span>
                 <span></span>
@@ -73,8 +71,6 @@ $currentScript = basename($_SERVER['PHP_SELF']);
                     </li>
                 <?php endforeach; ?>
                 <li class="drawer-mobile-only nav-drawer__actions">
-                    <a class="btn btn-secondary nav-drawer__action-btn" href="login.php">Sign In</a>
-                    <a class="btn btn-primary nav-drawer__action-btn" href="finder.php">Find My Degree</a>
                 </li>
                 <li class="nav-drawer__theme-toggle-item">
                     <button id="theme-toggle" class="btn-theme" aria-label="Toggle Dark Mode">🌙 Dark Mode</button>

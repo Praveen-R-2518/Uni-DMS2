@@ -10,10 +10,6 @@ body {
     min-height: 100vh;
 }
 
-.site-main {
-    /* removed top padding to eliminate white blank space */
-}
-
 .container {
     width: min(var(--page-max-width), 100% - 2 * var(--page-padding));
     margin: 0 auto;
@@ -25,7 +21,7 @@ body {
 }
 
 .section-shell:first-of-type {
-    padding-top: var(--space-20);
+    padding-top: var(--space-32);
 }
 
 .page-hero {
@@ -35,7 +31,7 @@ body {
     min-height: 250px;
     display: flex;
     align-items: flex-start;
-    padding: clamp(80px, 8vw, 100px) var(--page-padding) clamp(24px, 4vw, 40px);
+    padding: clamp(120px, 12vw, 160px) var(--page-padding) clamp(24px, 4vw, 40px);
     overflow: hidden;
 }
 
