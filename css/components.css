@@ -236,16 +236,16 @@ nav {
 }
 
 .btn-secondary {
-    background: transparent;
+    background: white;
     border: 1.5px solid var(--light-300);
-    color: var(--text-on-light-secondary);
+    color: white;
 }
 
 .btn-secondary:hover,
 .btn-secondary:focus-visible {
-    border-color: var(--accent-500);
-    color: var(--accent-500);
-    background: var(--accent-glow);
+    background: var(--light-100);
+    border-color: var(--light-400);
+    color: white;
 }
 
 .stats-grid {
