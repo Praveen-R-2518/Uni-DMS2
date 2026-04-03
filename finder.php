@@ -138,10 +138,10 @@ include "includes/header.php";
             </div>
         <?php endif; ?>
         
-        <div style="display:flex; gap: 32px; flex-wrap: wrap;">
+        <div class="finder-forms-grid">
             
             <!-- Z-Score Search Form -->
-            <form class="finder-stage reveal-on-scroll" method="POST" action="finder.php#results" style="flex:1; min-width: 300px;">
+            <form class="finder-stage reveal-on-scroll" method="POST" action="finder.php#results">
                 <input type="hidden" name="zscore_search" value="1">
                 <h3 style="margin-bottom: 16px;">Search by Z-Score & Subjects</h3>
                 
@@ -213,7 +213,7 @@ include "includes/header.php";
             </form>
             
             <!-- Degree Name Search Form -->
-            <form class="finder-stage reveal-on-scroll" method="POST" action="finder.php#results" style="flex:1; min-width: 300px; height: fit-content;">
+            <form class="finder-stage reveal-on-scroll" method="POST" action="finder.php#results">
                 <input type="hidden" name="name_search" value="1">
                 <h3 style="margin-bottom: 16px;">Search Degree</h3>
                 
