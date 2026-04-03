@@ -1,7 +1,6 @@
 <?php
 require_once 'includes/db.php';
 require_once 'includes/require_user_details.php';
-require_once 'includes/ui-helpers.php';
 
 $pageTitle = 'Universities';
 $pageStyles = ['css/pages/universities.css'];
@@ -68,6 +67,30 @@ $rankedIds = array_map(function ($item) {
     return $item['id'];
 }, array_slice($universities, 0, 2));
 
+$universityImageMap = [
+    'University of Colombo' => 'images/universities/colombo.jpg',
+    'University of Peradeniya' => 'images/universities/universityofperadeniya.jfif',
+    'University of Sri Jayewardenepura' => 'images/universities/universityofsrijayewardenepura.jpg',
+    'University of Kelaniya' => 'images/universities/universityofkelaniya.webp',
+    'University of Moratuwa' => 'images/universities/universityofmoratuwa.jpg',
+    'University of Jaffna' => 'images/universities/universityofjaffna.jpg',
+    'Eastern University' => 'images/universities/easternuniversityofmoratuwa.jpg',
+    'South Eastern University of Sri Lanka' => 'images/universities/seusl.jpg',
+    'Rajarata University of Sri Lanka' => 'images/universities/rajaratauniversity.jpg',
+    'Wayamba University of Sri Lanka' => 'images/universities/WayambaUniversity.jpg',
+    'Sabaragamuwa University of Sri Lanka' => 'images/universities/sabaragamuwa.jpg',
+    'Uva Wellassa University' => 'images/universities/uwawellassa.jpg',
+    'University of Ruhuna' => 'images/universities/universityofruhuna.jpg',
+    'University of Vavuniya, Sri Lanka' => 'images/universities/University_of_Vavuniya.png',
+    'University of Vavuniya' => 'images/universities/University_of_Vavuniya.png',
+    'Gampaha Wickramarachchi University of Indigenous Medicine, Sri Lanka' => 'images/universities/Gampaha Wickramarachchi University of Indigenous Medicine, Sri Lanka.JPG',
+    'Gampaha Wickramarachchi University of Indigenous Medicine' => 'images/universities/Gampaha Wickramarachchi University of Indigenous Medicine, Sri Lanka.JPG',
+    'University of Trincomalee' => 'images/universities/university_of_trincomalee.jpg',
+    'Trincomalee Campus, Eastern University, Sri Lanka' => 'images/universities/university_of_trincomalee.jpg',
+    'Swami Vipulananda Institute of Aesthetic Studies' => 'images/universities/Swami_Vipulananda_Institut_of_Aesthetic_Studies.jpg',
+    'Swami Vipulananda Institute of Aesthetic Studies, Eastern University, Sri Lanka' => 'images/universities/Swami_Vipulananda_Institut_of_Aesthetic_Studies.jpg',
+];
+
 include 'includes/header.php';
 ?>
 <style>
@@ -112,16 +135,47 @@ include 'includes/header.php';
         <?php if ($universities): ?>
             <div class="university-grid">
                 <?php foreach ($universities as $university): ?>
-                    <?php $image = getUniversityImagePath($university); ?>
+                    <?php
+                    $image = 'images/universities/placeholder.jpg';
+                    $rawImage = trim((string) ($university['image_url'] ?? $university['image'] ?? ''));
+                    $candidates = [];
+
+                    if ($rawImage !== '') {
+                        $rawImage = str_replace('\\', '/', $rawImage);
+                        $candidates[] = $rawImage;
+
+                        $baseName = basename($rawImage);
+                        if ($baseName !== '') {
+                            $candidates[] = 'images/universities/' . $baseName;
+                            $candidates[] = 'images/' . $baseName;
+                        }
+                    }
+
+                    if (!empty($university['name']) && isset($universityImageMap[$university['name']])) {
+                        $candidates[] = $universityImageMap[$university['name']];
+                    }
+
+                    foreach (array_unique($candidates) as $candidate) {
+                        if ($candidate !== '' && file_exists($candidate)) {
+                            $image = $candidate;
+                            break;
+                        }
+                    }
+
+                    $location = !empty($university['location']) ? $university['location'] : 'Sri Lanka';
+
+                    $description = !empty($university['description'])
+                        ? $university['description']
+                        : 'Discover programs and opportunities at this institution.';
+                    if (strlen($description) > 200) {
+                        $description = substr($description, 0, 200) . '...';
+                    }
+                    ?>
                     <article class="university-card reveal-on-scroll" data-streams="<?php echo htmlspecialchars($university['stream_list']); ?>">
                         <div class="university-image">
-                            <?php if ($image): ?>
-                                <img src="<?php echo htmlspecialchars($image, ENT_QUOTES, 'UTF-8'); ?>" loading="lazy" alt="<?php echo htmlspecialchars($university['name']); ?>">
-                            <?php else: ?>
-                                <div class="university-image university-image--placeholder"></div>
-                            <?php endif; ?>
+                            <img src="<?php echo htmlspecialchars($image, ENT_QUOTES, 'UTF-8'); ?>" loading="lazy" alt="<?php echo htmlspecialchars($university['name']); ?>">
                             <div class="image-overlay">
-                                <div class="location-tag"><i class="fa-solid fa-location-dot" aria-hidden="true"></i> <?php echo htmlspecialchars(getUniversityLocation($university)); ?></div>
+                                <div class="location-tag"><i class="fa-solid fa-location-dot" aria-hidden="true"></i> <?php echo htmlspecialchars($location); ?></div>
                                 <?php if (!empty($university['type'])): ?>
                                     <span class="type-badge type-<?php echo strtolower($university['type']); ?>"><?php echo htmlspecialchars($university['type']); ?></span>
                                 <?php else: ?>
@@ -131,7 +185,7 @@ include 'includes/header.php';
                             </div>
                         </div>
                         <div class="university-content">
-                            <p><?php echo htmlspecialchars(getUniversityDescription($university)); ?></p>
+                            <p><?php echo htmlspecialchars($description); ?></p>
                             <div class="pills">
                                 <span class="pill degree-pill"><?php echo $university['degree_count']; ?> Degrees</span>
                             <?php if (!empty($university['stream_list']) && $university['stream_list'] !== 'All'): ?>

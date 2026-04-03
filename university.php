@@ -1,6 +1,5 @@
 <?php
 require_once 'includes/db.php';
-require_once 'includes/ui-helpers.php';
 
 $pageStyles = ['css/pages/universities.css'];
 
@@ -89,6 +88,16 @@ if ($university) {
     }
 }
 
+$heroDescription = '';
+if ($university) {
+    $heroDescription = !empty($university['description'])
+        ? $university['description']
+        : 'Discover programs and opportunities at this institution.';
+    if (strlen($heroDescription) > 320) {
+        $heroDescription = substr($heroDescription, 0, 320) . '...';
+    }
+}
+
 include 'includes/header.php';
 ?>
 <?php if ($university): ?>
@@ -96,7 +105,7 @@ include 'includes/header.php';
         <div class="container">
             <div class="hero-text">
                 <h1><?php echo htmlspecialchars($university['name']); ?></h1>
-                <p class="page-hero-meta"><?php echo htmlspecialchars(getUniversityDescription($university, 320)); ?></p>
+                <p class="page-hero-meta"><?php echo htmlspecialchars($heroDescription); ?></p>
             </div>
         </div>
     </section>
