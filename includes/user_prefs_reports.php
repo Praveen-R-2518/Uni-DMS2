@@ -1,4 +1,4 @@
-<?php
+﻿<?php
 require_once "includes/db.php";
 
 $totO_res = $conn->query("SELECT COUNT(*) as c FROM user_preferences");
@@ -11,10 +11,7 @@ $totG_res = $conn->query("SELECT COUNT(*) as c FROM user_preferences WHERE gende
 $totG = ($r = $totG_res->fetch_assoc()) && $r['c'] > 0 ? $r['c'] : 1;
 
 // 1. Stream Preferences
-$streamLabels = [];
-$streamBoysData = [];
-$streamGirlsData = [];
-
+$streamsData = [];
 $streamRes = $conn->query("SELECT DISTINCT stream FROM user_preferences WHERE stream IS NOT NULL AND stream != ''");
 $allStreams = [];
 if ($streamRes) {
@@ -27,206 +24,163 @@ if (empty($allStreams)) {
 }
 
 foreach ($allStreams as $s) {
-    $streamLabels[] = $s;
-    
     $sb = $conn->query("SELECT COUNT(*) as c FROM user_preferences WHERE stream='" . $conn->real_escape_string($s) . "' AND gender='Male'")->fetch_assoc()['c'];
-    $streamBoysData[] = round(($sb / $totB) * 100, 1);
+    $bPct = round(($sb / $totB) * 100, 1);
     
     $sg = $conn->query("SELECT COUNT(*) as c FROM user_preferences WHERE stream='" . $conn->real_escape_string($s) . "' AND gender='Female'")->fetch_assoc()['c'];
-    $streamGirlsData[] = round(($sg / $totG) * 100, 1);
+    $gPct = round(($sg / $totG) * 100, 1);
+    
+    $streamsData[] = [
+        'name' => $s,
+        'boys' => $bPct,
+        'girls' => $gPct
+    ];
 }
 
 // Function to get top degrees with university
-function getTopDegrees($conn, $gender, $totalCount) {
-    $labels = [];
+function getTopDegreesData($conn, $gender, $totalCount) {
     $data = [];
     $where = $gender ? "WHERE gender='" . $conn->real_escape_string($gender) . "'" : "";
     $q = "SELECT degree, university, COUNT(*) as c FROM user_preferences $where GROUP BY degree, university ORDER BY c DESC LIMIT 5";
     $res = $conn->query($q);
     if ($res) {
         while ($r = $res->fetch_assoc()) {
-            $shortUni = strlen($r['university']) > 25 ? substr($r['university'], 0, 25) . "..." : $r['university'];
-            // Append short university name to the label
-            $labels[] = $r['degree'] . " (" . $shortUni . ")";
-            $data[] = round(($r['c'] / $totalCount) * 100, 1);
+            $data[] = [
+                'degree' => $r['degree'],
+                'university' => $r['university'],
+                'percent' => round(($r['c'] / $totalCount) * 100, 1)
+            ];
         }
     }
-    return ['labels' => $labels, 'data' => $data];
+    return $data;
 }
 
-$degBoys = getTopDegrees($conn, 'Male', $totB);
-$degGirls = getTopDegrees($conn, 'Female', $totG);
-$degOverall = getTopDegrees($conn, null, $totO);
+$degBoys = getTopDegreesData($conn, 'Male', $totB);
+$degGirls = getTopDegreesData($conn, 'Female', $totG);
+$degOverall = getTopDegreesData($conn, null, $totO);
 ?>
 
-<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+<style>
+.report-item { margin-bottom: 1.5rem; }
+.report-item:last-child { margin-bottom: 0; }
+.report-title {
+    font-size: 0.95rem; font-weight: 600; color: var(--dark-900);
+    margin-bottom: 0.5rem; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
+}
+.report-title span { color: var(--dark-500); font-weight: 400; }
+.report-bar-row { display: flex; align-items: center; gap: 12px; }
+.report-bar-wrap { flex: 1; background: #eef2f6; height: 10px; border-radius: 6px; overflow: hidden; }
+.report-bar { height: 100%; border-radius: 6px; transition: width 1s ease-out; }
+.bg-pink { background: rgba(236, 72, 153, 0.85); }
+.bg-blue { background: rgba(59, 130, 246, 0.85); }
+.bg-green { background: rgba(16, 185, 129, 0.85); }
+.report-pct { width: 40px; font-size: 0.8rem; text-align: right; font-weight: bold; color: var(--dark-600); }
+.report-gender-lbl { width: 36px; font-size: 0.75rem; color: var(--dark-400); text-transform: uppercase; letter-spacing: 0.5px; }
+</style>
 
 <section class="section-shell" style="padding-top: 3rem; background: var(--surface-light); padding-bottom: 5rem;">
     <div class="container">
         
         <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(450px, 1fr)); gap: 2rem;">
             
-            <!-- Stream Preferences (Both Boys and Girls) -->
             <div style="background: white; padding: 2rem; border-radius: var(--radius-lg); box-shadow: var(--shadow-light-md); border: 1px solid var(--light-300);">
                 <h3 style="color: var(--primary-600); margin-bottom: 0.5rem; font-size: 1.5rem;"><i class="fas fa-chart-line"></i> Stream Preferences</h3>
-                <p style="font-size: 0.95rem; color: var(--dark-500); margin-bottom: 1.5rem;">Comparison between boys and girls across all collected preferences.</p>
-                <div style="position: relative; height: 260px; width: 100%;">
-                    <canvas id="streamChart"></canvas>
+                <p style="font-size: 0.95rem; color: var(--dark-500); margin-bottom: 2rem;">Comparison between boys and girls.</p>
+                
+                <div class="report-content">
+                    <?php if(empty(array_filter(array_column($streamsData, 'boys'))) && empty(array_filter(array_column($streamsData, 'girls')))): ?>
+                        <p style="color: var(--dark-400);">Not enough data yet.</p>
+                    <?php else: ?>
+                        <?php foreach($streamsData as $s): ?>
+                            <div class="report-item" title="<?php echo htmlspecialchars($s['name']); ?>">
+                                <div class="report-title"><?php echo htmlspecialchars($s['name']); ?></div>
+                                
+                                <div class="report-bar-row" style="margin-bottom: 6px;">
+                                    <div class="report-gender-lbl">Boys</div>
+                                    <div class="report-bar-wrap"><div class="report-bar bg-blue" style="width: <?php echo $s['boys']; ?>%;"></div></div>
+                                    <div class="report-pct"><?php echo $s['boys']; ?>%</div>
+                                </div>
+
+                                <div class="report-bar-row">
+                                    <div class="report-gender-lbl">Girls</div>
+                                    <div class="report-bar-wrap"><div class="report-bar bg-pink" style="width: <?php echo $s['girls']; ?>%;"></div></div>
+                                    <div class="report-pct"><?php echo $s['girls']; ?>%</div>
+                                </div>
+                            </div>
+                        <?php endforeach; ?>
+                    <?php endif; ?>
                 </div>
-                <?php if(empty(array_filter($streamBoysData)) && empty(array_filter($streamGirlsData))) echo '<p style="text-align:center; margin-top: -150px; color: var(--dark-400);">Not enough data yet.</p>'; ?>
             </div>
             
-            <!-- Highest Demanded Degrees - Boys -->
             <div style="background: white; padding: 2rem; border-radius: var(--radius-lg); box-shadow: var(--shadow-light-md); border: 1px solid var(--light-300);">
-                <h3 style="color: var(--primary-600); margin-bottom: 0.5rem; font-size: 1.5rem;"><i class="fas fa-male"></i> Highest Demand Degree: Boys</h3>
-                <p style="font-size: 0.95rem; color: var(--dark-500); margin-bottom: 1.5rem;">Top 5 degrees demanded specifically by male users (includes the preferred University).</p>
-                <div style="position: relative; height: 260px; width: 100%;">
-                    <canvas id="boysChart"></canvas>
+                <h3 style="color: var(--primary-600); margin-bottom: 0.5rem; font-size: 1.5rem;"><i class="fas fa-male"></i> Highest Demanded Degrees: Boys</h3>
+                <p style="font-size: 0.95rem; color: var(--dark-500); margin-bottom: 2rem;">Top 5 demanded degrees.</p>
+                
+                <div class="report-content">
+                    <?php if(empty($degBoys)): ?>
+                        <p style="color: var(--dark-400);">Not enough data yet.</p>
+                    <?php else: ?>
+                        <?php foreach($degBoys as $d): ?>
+                            <div class="report-item" title="<?php echo htmlspecialchars($d['degree'] . ' : ' . $d['university']); ?>">
+                                <div class="report-title">
+                                    <?php echo htmlspecialchars($d['degree']); ?> : <span><?php echo htmlspecialchars($d['university']); ?></span>
+                                </div>
+                                <div class="report-bar-row">
+                                    <div class="report-bar-wrap"><div class="report-bar bg-blue" style="width: <?php echo $d['percent']; ?>%;"></div></div>
+                                    <div class="report-pct"><?php echo $d['percent']; ?>%</div>
+                                </div>
+                            </div>
+                        <?php endforeach; ?>
+                    <?php endif; ?>
                 </div>
-                <?php if(empty($degBoys['labels'])) echo '<p style="text-align:center; margin-top: -150px; color: var(--dark-400);">Not enough data yet.</p>'; ?>
             </div>
 
-            <!-- Highest Demanded Degrees - Girls -->
             <div style="background: white; padding: 2rem; border-radius: var(--radius-lg); box-shadow: var(--shadow-light-md); border: 1px solid var(--light-300);">
-                <h3 style="color: var(--primary-600); margin-bottom: 0.5rem; font-size: 1.5rem;"><i class="fas fa-female"></i> Highest Demand Degree: Girls</h3>
-                <p style="font-size: 0.95rem; color: var(--dark-500); margin-bottom: 1.5rem;">Top 5 degrees demanded specifically by female users (includes the preferred University).</p>
-                <div style="position: relative; height: 260px; width: 100%;">
-                    <canvas id="girlsChart"></canvas>
+                <h3 style="color: var(--primary-600); margin-bottom: 0.5rem; font-size: 1.5rem;"><i class="fas fa-female"></i> Highest Demanded Degrees: Girls</h3>
+                <p style="font-size: 0.95rem; color: var(--dark-500); margin-bottom: 2rem;">Top 5 demanded degrees.</p>
+                
+                <div class="report-content">
+                    <?php if(empty($degGirls)): ?>
+                        <p style="color: var(--dark-400);">Not enough data yet.</p>
+                    <?php else: ?>
+                        <?php foreach($degGirls as $d): ?>
+                            <div class="report-item" title="<?php echo htmlspecialchars($d['degree'] . ' : ' . $d['university']); ?>">
+                                <div class="report-title">
+                                    <?php echo htmlspecialchars($d['degree']); ?> : <span><?php echo htmlspecialchars($d['university']); ?></span>
+                                </div>
+                                <div class="report-bar-row">
+                                    <div class="report-bar-wrap"><div class="report-bar bg-pink" style="width: <?php echo $d['percent']; ?>%;"></div></div>
+                                    <div class="report-pct"><?php echo $d['percent']; ?>%</div>
+                                </div>
+                            </div>
+                        <?php endforeach; ?>
+                    <?php endif; ?>
                 </div>
-                <?php if(empty($degGirls['labels'])) echo '<p style="text-align:center; margin-top: -150px; color: var(--dark-400);">Not enough data yet.</p>'; ?>
             </div>
 
-            <!-- Highest Demanded Degrees - Overall -->
             <div style="background: white; padding: 2rem; border-radius: var(--radius-lg); box-shadow: var(--shadow-light-md); border: 1px solid var(--light-300);">
-                <h3 style="color: var(--primary-600); margin-bottom: 0.5rem; font-size: 1.5rem;"><i class="fas fa-globe"></i> Highest Demand Degree: Overall</h3>
-                <p style="font-size: 0.95rem; color: var(--dark-500); margin-bottom: 1.5rem;">The top 5 overall demanded degrees combined (includes the preferred University).</p>
-                <div style="position: relative; height: 260px; width: 100%;">
-                    <canvas id="overallChart"></canvas>
+                <h3 style="color: var(--primary-600); margin-bottom: 0.5rem; font-size: 1.5rem;"><i class="fas fa-globe"></i> Highest Demanded Degrees: Overall</h3>
+                <p style="font-size: 0.95rem; color: var(--dark-500); margin-bottom: 2rem;">Top 5 demanded degrees.</p>
+                
+                <div class="report-content">
+                    <?php if(empty($degOverall)): ?>
+                        <p style="color: var(--dark-400);">Not enough data yet.</p>
+                    <?php else: ?>
+                        <?php foreach($degOverall as $d): ?>
+                            <div class="report-item" title="<?php echo htmlspecialchars($d['degree'] . ' : ' . $d['university']); ?>">
+                                <div class="report-title">
+                                    <?php echo htmlspecialchars($d['degree']); ?> : <span><?php echo htmlspecialchars($d['university']); ?></span>
+                                </div>
+                                <div class="report-bar-row">
+                                    <div class="report-bar-wrap"><div class="report-bar bg-green" style="width: <?php echo $d['percent']; ?>%;"></div></div>
+                                    <div class="report-pct"><?php echo $d['percent']; ?>%</div>
+                                </div>
+                            </div>
+                        <?php endforeach; ?>
+                    <?php endif; ?>
                 </div>
-                <?php if(empty($degOverall['labels'])) echo '<p style="text-align:center; margin-top: -150px; color: var(--dark-400);">Not enough data yet.</p>'; ?>
             </div>
             
         </div>
     </div>
 </section>
-
-<script>
-document.addEventListener("DOMContentLoaded", function() {
-    function createBarChart(ctxId, labels, datasetsData) {
-        var canvas = document.getElementById(ctxId);
-        if(!canvas) return;
-        var ctx = canvas.getContext('2d');
-        if(labels.length === 0) return; // Prevent rendering empty charts
-        
-        new Chart(ctx, {
-            type: 'bar',
-            data: {
-                labels: labels,
-                datasets: datasetsData
-            },
-            options: {
-                indexAxis: 'y', // Makes it horizontal
-                responsive: true,
-                maintainAspectRatio: false,
-                onHover: (e, activeElements, chart) => {
-                    const canvas = chart.canvas;
-                    if(activeElements.length > 0) {
-                        // Hovering over a bar
-                        canvas.style.cursor = 'pointer';
-                        canvas.title = labels[activeElements[0].index];
-                    } else {
-                        // Check if hovering over y-axis labels
-                        const yAxis = chart.scales.y;
-                        if(e.x >= yAxis.left && e.x <= yAxis.right && e.y >= yAxis.top && e.y <= yAxis.bottom) {
-                            const val = yAxis.getValueForPixel(e.y);
-                            if(val >= 0 && val < labels.length) {
-                                canvas.title = labels[val];
-                                canvas.style.cursor = 'pointer';
-                                return;
-                            }
-                        }
-                        canvas.style.cursor = 'default';
-                        canvas.title = '';
-                    }
-                },
-                scales: {
-                    x: {
-                        display: false, // hide completely so there's no bottom axis
-                        max: 100,
-                        beginAtZero: true
-                    },
-                    y: {
-                        grid: {
-                            display: false, // hide grid lines behind bars
-                            drawBorder: false // hide axis line
-                        },
-                        ticks: {
-                            callback: function(value, index, values) { 
-                                // Shorten y-axis labels if they are extremely long
-                                let lbl = labels[index];
-                                return lbl.length > 40 ? lbl.substring(0, 40) + '...' : lbl;
-                            }
-                        }
-                    }
-                },
-                plugins: {
-                    legend: {
-                        display: datasetsData.length > 1 // Only show legend if multiple datasets (streams)
-                    },
-                    tooltip: {
-                        callbacks: {
-                            title: function(context) { return labels[context[0].dataIndex]; },
-                            label: function(context) { return context.dataset.label + ': ' + context.parsed.x + '%'; }
-                        }
-                    }
-                }
-            }
-        });
-    }
-
-    // Stream Analytics Bar Chart
-    createBarChart('streamChart', <?php echo json_encode($streamLabels); ?>, [
-        {
-            label: 'Boys',
-            data: <?php echo json_encode($streamBoysData); ?>,
-            backgroundColor: 'rgba(59, 130, 246, 0.85)', // Blue
-            maxBarThickness: 12,
-            borderRadius: 4
-        },
-        {
-            label: 'Girls',
-            data: <?php echo json_encode($streamGirlsData); ?>,
-            backgroundColor: 'rgba(236, 72, 153, 0.85)', // Pink
-            maxBarThickness: 12,
-            borderRadius: 4
-        }
-    ]);
-
-    // Boys Demanded Degrees Bar Chart
-    createBarChart('boysChart', <?php echo json_encode($degBoys['labels']); ?>, [{
-        label: 'Demand',
-        data: <?php echo json_encode($degBoys['data']); ?>,
-        backgroundColor: 'rgba(59, 130, 246, 0.85)', // Blue
-        maxBarThickness: 12,
-        borderRadius: 4
-    }]);
-
-    // Girls Demanded Degrees Bar Chart
-    createBarChart('girlsChart', <?php echo json_encode($degGirls['labels']); ?>, [{
-        label: 'Demand',
-        data: <?php echo json_encode($degGirls['data']); ?>,
-        backgroundColor: 'rgba(236, 72, 153, 0.85)', // Pink
-        maxBarThickness: 12,
-        borderRadius: 4
-    }]);
-
-    // Overall Demanded Degrees Bar Chart
-    createBarChart('overallChart', <?php echo json_encode($degOverall['labels']); ?>, [{
-        label: 'Demand',
-        data: <?php echo json_encode($degOverall['data']); ?>,
-        backgroundColor: 'rgba(16, 185, 129, 0.85)', // Green
-        maxBarThickness: 12,
-        borderRadius: 4
-    }]);
-});
-</script>
