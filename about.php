@@ -69,10 +69,9 @@ include 'includes/header.php';
     <div class="container cta-energy-wrapper">
         <div class="cta-energy-content reveal-on-scroll">
             <h2 class="cta-energy-heading">Ready to Find Your Path?</h2>
-            <p class="cta-energy-subheading">Don't let your future wait. Start exploring degrees or check your Z-score eligibility today.</p>
+            <p class="cta-energy-subheading">Don't let your future wait. Discover the right degree for you today.</p>
             <div class="cta-energy-buttons">
-                <a href="finder.php" class="btn btn-primary cta-energy-btn">Explore Degrees</a>
-                <a href="finder.php" class="btn btn-secondary cta-energy-btn">Find My Z-Score</a>
+                <a href="finder.php" class="btn btn-primary cta-energy-btn">Find My Degree</a>
             </div>
         </div>
         <div class="cta-energy-decoration" aria-hidden="true"></div>

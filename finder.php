@@ -2,7 +2,7 @@
 require_once "includes/db.php";
 require_once "includes/require_user_details.php";
 
-$pageTitle = "Z-Score Finder";
+$pageTitle = "Find My Degree";
 $pageStyles = ["css/pages/finder.css"];
 
 $degrees = [];
@@ -124,8 +124,8 @@ include "includes/header.php";
 ?>
 <section class="page-hero reveal-on-scroll" aria-label="Finder hero">
     <div class="container">
-        <p class="eyebrow">Z-Score Finder</p>
-        <h1>Z-Score Degree Finder</h1>
+        <p class="eyebrow">Find My Degree</p>
+        <h1>Find My Degree</h1>
         <p class="page-hero-meta">Match your A/L results to degrees according to your subject combination and district, or search by degree name directly.</p>
     </div>
 </section>
