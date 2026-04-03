@@ -35,7 +35,7 @@ $currentScript = basename($_SERVER['PHP_SELF']);
 </head>
 <body>
 <div class="site-shell">
-    <header class="floating-navbar">
+    <header class="floating-navbar" style="border-radius:6px;">
         <div class="floating-navbar__brand">
             <a class="floating-navbar__brand-link" href="index.php">
                 <img class="brand-logo" src="images/Logo/logo.svg" alt="UGrad logo">
