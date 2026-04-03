@@ -10,7 +10,7 @@ $footerNav = [
             <div class="footer-grid">
                 <div class="footer-brand-section">
                     <div class="footer-logo">
-                        <div class="footer-logo-mark"></div>
+                        <img class="footer-logo-mark" src="images/Logo/logo.svg" alt="UGrad logo">
                         <span class="footer-logo-text">UGrad</span>
                     </div>
                     <p class="footer-description">Sri Lanka's calm authority for the university decision. Empowers students with data-driven insights for a brighter future.</p>

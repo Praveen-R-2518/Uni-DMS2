@@ -41,8 +41,21 @@
 .floating-navbar__brand-link {
     display: flex;
     align-items: center;
+    gap: var(--space-2);
     text-decoration: none;
     color: inherit;
+}
+
+.brand-logo {
+    height: 28px;
+    width: auto;
+    object-fit: contain;
+    display: block;
+    flex-shrink: 0;
+}
+
+.floating-navbar__brand-link span {
+    line-height: 1;
 }
 
 nav {
@@ -892,11 +905,11 @@ nav {
 }
 
 .footer-logo-mark {
-    width: 24px;
-    height: 24px;
-    background: var(--accent-500);
-    border-radius: 8px;
-    box-shadow: 0 0 15px var(--accent-glow-strong);
+    height: 22px;
+    width: auto;
+    object-fit: contain;
+    display: block;
+    flex-shrink: 0;
 }
 
 .footer-logo-text {
@@ -904,6 +917,7 @@ nav {
     font-weight: 800;
     color: white;
     letter-spacing: -0.02em;
+    line-height: 1;
 }
 
 .footer-description {
