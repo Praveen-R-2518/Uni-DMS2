@@ -1,6 +1,6 @@
 <?php
 $footerNav = [
-    'Navigate' => ['Home' => 'index.php', 'Universities' => 'universities.php', 'Z-Score Finder' => 'finder.php'],
+    'Navigate' => ['Home' => 'index.php', 'Universities' => 'universities.php', 'Find my degree' => 'finder.php', 'Reports' => 'reports.php'],
     'Resources' => ['Gallery' => 'gallery.php', 'About' => 'about.php']
 ];
 ?>
