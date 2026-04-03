@@ -53,11 +53,6 @@ include 'includes/header.php';
                 <p>Explore every available degree program, understand the modules, and access curated YouTube resources and study materials.</p>
             </article>
             <article class="offer-card reveal-on-scroll">
-                <div class="offer-icon" aria-hidden="true"><img src="images/icons/z_core_calculator_icon.png" alt="" loading="lazy"></div>
-                <h3>Smart Z-Score Calculator</h3>
-                <p>Take the guesswork out of university admissions. Input your results and instantly see which paths are open to you.</p>
-            </article>
-            <article class="offer-card reveal-on-scroll">
                 <div class="offer-icon" aria-hidden="true"><img src="images/icons/career_guidance_icon.png" alt="" loading="lazy"></div>
                 <h3>Career Guidance</h3>
                 <p>Not sure what to do next? Discover future career opportunities linked to specific degrees and get advice on how to get there.</p>
@@ -69,10 +64,9 @@ include 'includes/header.php';
     <div class="container cta-energy-wrapper">
         <div class="cta-energy-content reveal-on-scroll">
             <h2 class="cta-energy-heading">Ready to Find Your Path?</h2>
-            <p class="cta-energy-subheading">Don't let your future wait. Start exploring degrees or check your Z-score eligibility today.</p>
+            <p class="cta-energy-subheading">Don't let your future wait. Discover the right degree for you today.</p>
             <div class="cta-energy-buttons">
-                <a href="finder.php" class="btn btn-primary cta-energy-btn">Explore Degrees</a>
-                <a href="finder.php" class="btn btn-secondary cta-energy-btn">Find My Z-Score</a>
+                <a href="finder.php" class="btn btn-primary cta-energy-btn">Find My Degree</a>
             </div>
         </div>
         <div class="cta-energy-decoration" aria-hidden="true"></div>

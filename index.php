@@ -56,8 +56,8 @@ include 'includes/user_prefs_popup.php';
                 <p>Explore campus stories through labs, green spaces, and student life moments.</p>
                 <a class="btn btn-primary" href="gallery.php">Open Gallery</a>
             </article>
-            <article class="flow-card is-finder" aria-label="Z-Score Finder card">
-                <h3>Z-Score Finder</h3>
+            <article class="flow-card is-finder" aria-label="Find My Degree card">
+                <h3>Find My Degree</h3>
                 <p>Enter your stream and score to instantly discover degrees matched to your results.</p>
                 <a class="btn btn-primary" href="finder.php">Launch Finder</a>
             </article>

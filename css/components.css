@@ -388,7 +388,7 @@ nav {
 
 .offer-grid {
     display: grid;
-    grid-template-columns: repeat(4, minmax(0, 1fr));
+    grid-template-columns: repeat(3, minmax(0, 1fr));
     gap: var(--space-4);
 }
 
@@ -438,27 +438,35 @@ nav {
 
 .mission-vision-stack {
     display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
     gap: var(--space-6);
+    align-items: stretch;
 }
 
 .glass-story-card {
     position: relative;
-    display: grid;
-    grid-template-columns: auto 1fr auto;
-    align-items: center;
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
     gap: var(--space-5);
-    padding: clamp(22px, 3.2vw, 34px);
-    border-radius: var(--radius-xl);
-    border: 1px solid rgba(255, 255, 255, 0.52);
-    background: rgba(248, 249, 252, 0.58);
-    backdrop-filter: blur(16px) saturate(130%);
-    -webkit-backdrop-filter: blur(16px) saturate(130%);
-    box-shadow: 0 14px 34px rgba(15, 23, 42, 0.12), inset 0 1px 0 rgba(255, 255, 255, 0.45);
+    padding: clamp(32px, 4vw, 48px);
+    border-radius: var(--radius-2xl);
+    border: 1px solid rgba(255, 255, 255, 0.7);
+    background: linear-gradient(135deg, rgba(255, 255, 255, 0.6) 0%, rgba(255, 255, 255, 0.2) 100%);
+    backdrop-filter: blur(24px) saturate(150%);
+    -webkit-backdrop-filter: blur(24px) saturate(150%);
+    box-shadow: 0 20px 40px rgba(31, 38, 135, 0.07), inset 0 2px 4px rgba(255, 255, 255, 0.9);
     overflow: hidden;
+    transition: transform 0.4s var(--ease-spring), box-shadow 0.4s var(--ease-spring);
+}
+
+.glass-story-card:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 30px 60px rgba(31, 38, 135, 0.12), inset 0 2px 4px rgba(255, 255, 255, 0.9);
 }
 
 .glass-story-card.no-leading-icon {
-    grid-template-columns: 1fr auto;
+    /* Kept for structural compatibility if needed but replaced grid with flex */
 }
 
 .glass-story-card::before {
@@ -493,8 +501,7 @@ nav {
 }
 
 .story-icon-badge,
-.story-copy,
-.story-accent {
+.story-copy {
     position: relative;
     z-index: 1;
 }
@@ -529,16 +536,20 @@ nav {
 
 .story-copy p:last-child {
     margin: 0;
-    max-width: 74ch;
 }
 
 .story-accent {
-    font-size: clamp(1.4rem, 2.2vw, 2rem);
-    color: rgba(79, 70, 229, 0.65);
+    position: absolute !important;
+    top: -20px;
+    right: -20px;
+    font-size: clamp(8rem, 15vw, 14rem);
+    color: rgba(79, 70, 229, 0.08); /* Faded watermark behind */
+    z-index: 0 !important;
+    transform: rotate(15deg);
 }
 
 .vision-card .story-accent {
-    color: rgba(99, 102, 241, 0.72);
+    color: rgba(99, 102, 241, 0.08);
 }
 
 .vision-card .story-copy p:last-child {
@@ -757,6 +768,10 @@ nav {
     .offer-grid {
         grid-template-columns: repeat(2, minmax(0, 1fr));
     }
+    
+    .offer-card:last-child {
+        grid-column: 1 / -1;
+    }
 
     .mission-vision-section {
         padding-top: clamp(132px, 32vw, 190px);
@@ -768,7 +783,8 @@ nav {
     }
 
     .story-accent {
-        display: none;
+        display: block; /* Show the watermark even on mobile */
+        font-size: 8rem;
     }
 
     .story-icon-badge {
@@ -782,6 +798,9 @@ nav {
 @media (max-width: var(--bp-sm)) {
     .offer-grid {
         grid-template-columns: 1fr;
+    }
+    .offer-card:last-child {
+        grid-column: auto;
     }
 }
 
